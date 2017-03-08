@@ -1,4 +1,4 @@
-const githubReporting = require('./githubReporting.js');
+const githubReporting = require('./githubReporting/index.js');
 module.exports = {
   githubReporting
 };

@@ -14,8 +14,8 @@ rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, (rtmStartData) => {
 
 rtm.start();
 
-let githubJob = null;
+let githubReportJob = null;
 
 rtm.on(RTM_EVENTS.MESSAGE, function(message) {
-  githubJob = githubReporting(rtm, message, githubJob);
+  githubReportJob = githubReporting(rtm, message, githubReportJob);
 });
