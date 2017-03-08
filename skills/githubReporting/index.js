@@ -10,6 +10,7 @@ const {
 	REPO_OWNER,
 } = process.env;
 const {TEAMS} = require('./constants.js');
+const SHOW_ALL_USERS = false;
 
 const fetchAllEvents = (apiUrl) => {
 	const promises = []
@@ -140,11 +141,13 @@ const UpdateGithubEvent = (targetUsers, repoName) => {
 		const yestdayYMD = today.toISOString().split('T').shift()
 		Object.keys(targetUsers).forEach(userId => {
 			let userEvents = evts[userId] || [];
-			result += `\n${targetUsers[userId]} (${userEvents.length})\n`;
-			userEvents.forEach(evt => {
-				const t = moment(evt.created_at).format('HH:mm');
-				result += `[${t}] [${evt.action}] ${evt.message}\n`
-			})
+			if (SHOW_ALL_USERS || userEvents.length !== 0) {
+				result += `\n${targetUsers[userId]} (${userEvents.length})\n`;
+				userEvents.forEach(evt => {
+					const t = moment(evt.created_at).format('HH:mm');
+					result += `[${t}] [${evt.action}] ${evt.message}\n`
+				});
+			}
 		});
 		return result;
 		console.log('last update ' + new Date())
@@ -169,9 +172,11 @@ function reportGithubEvent(rtm, message, job) {
 			rtm.sendMessage('Github reporting job is already running', messageChannel);
 		} else {
 			rtm.sendMessage(`Github reporting *started*, will report to channel *${GITHUB_REPORT_TARGET_CHANNEL}*`, messageChannel);
-			job = new CronJob('00 */2 * * * 1-5', () => {
+			job = new CronJob('00 30 9 * * 2-6', () => {
+				const today = moment().format('YYYY-MM-DD');
+				rtm.sendMessage(`*Github log for ${today}:*\n\n`, channelID);
 				TEAMS.forEach(({TEAM_NAME, REPO_NAME, MEMBERS}) => {
-					let teamResult = `\n*Report for ${TEAM_NAME}:*\n`;
+					let teamResult = `\n*${TEAM_NAME}:*\n`;
 					UpdateGithubEvent(MEMBERS, REPO_NAME).then(result => {
 						rtm.sendMessage(`${teamResult}${result}`, channelID);
 					});
