@@ -157,10 +157,10 @@ const UpdateGithubEvent = (targetUsers, repoName) => {
 }
 
 function reportGithubEvent(rtm, message, job) {
-	const groups = rtm.dataStore.groups;
+	const channels = Object.assign({}, rtm.dataStore.groups, rtm.dataStore.channels);
 	const messageChannel = message.channel;
-	const channelID = Object.keys(groups).reduce((result, id) => {
-		return groups[id].name === GITHUB_REPORT_TARGET_CHANNEL ? id : result;
+	const channelID = Object.keys(channels).reduce((result, id) => {
+		return channels[id].name === GITHUB_REPORT_TARGET_CHANNEL ? id : result;
 	}, '');
 	const text = message.text;
 	const isMentioned = text && text.includes(`<@${rtm.activeUserId}>`);
